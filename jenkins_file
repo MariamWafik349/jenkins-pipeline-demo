@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // This step checks out the repository code
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Example build step, adjust as needed
+                echo "Building the application..."
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Placeholder for any tests
+                echo "Running tests..."
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Placeholder for deployment
+                echo "Deploying the application..."
+            }
+        }
+    }
+
+    post {
+        always {
+            // Run this block regardless of success or failure
+            echo "Pipeline completed."
+        }
+        success {
+            echo "Pipeline finished successfully!"
+        }
+        failure {
+            echo "Pipeline failed. Please check the logs for details."
+        }
+    }
+}
