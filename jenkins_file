@@ -1,67 +1,52 @@
 pipeline {
     agent any
-
     environment {
-        DOCKER_IMAGE = 'my-app-image:latest' // Name of the Docker image
-        REPO_URL = 'https://github.com/MariamWafik349/jenkins-pipeline-demo.git' // Repository URL
+        DOCKER_IMAGE = 'quay.io/anwarfouad/mysql-app'  // Replace with your Docker Hub repository
+        DOCKER_TAG = 'latest'
     }
-
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
-                echo "Checked out repository from ${REPO_URL}"
+                git branch: 'main' , url: 'https://github.com/MariamWafik349/jenkins-pipeline-demo.git'  // Replace with your repository URL
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo "Building Docker image..."
-                    docker.build("${DOCKER_IMAGE}")
+                    // Build the Docker image with a specific tag
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
                 }
             }
         }
-
-        stage('Run Tests') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    echo "Running tests..."
-                    // Run the container and test endpoint
-                    sh """
-                    docker run -d --name test-container -p 5000:5000 ${DOCKER_IMAGE}
-                    sleep 5
-                    curl -f http://localhost:5000 || (echo 'Tests failed!' && exit 1)
-                    docker stop test-container
-                    docker rm test-container
-                    """
-                    echo "Tests completed successfully!"
+                    // Use withCredentials to securely access Docker Hub credentials
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        // Log in to Docker Hub using the credentials
+                        sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+
+                        // Push the Docker image to Docker Hub
+                        sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    }
                 }
             }
         }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    echo "Deploying the Docker container..."
-                    sh """
-                    docker run -d --name deployed-container -p 5000:5000 ${DOCKER_IMAGE}
-                    """
-                    echo "Application deployed and running at http://<JENKINS_SERVER>:5000"
-                }
-            }
-        }
-    }
-
     post {
         always {
-            echo "Pipeline completed."
+            script {
+                // Clean up the Docker container if it exists
+                sh "docker rm -f my_container || true"
+
+                // Log out of Docker Hub
+                sh "docker logout"
+            }
         }
         success {
-            echo "Pipeline finished successfully!"
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo "Pipeline failed. Please check the logs for details."
+            echo 'Pipeline failed!'
         }
     }
 }
