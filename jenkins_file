@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Use named parameters for the git step
-                git url: 'https://github.com/AbdallahHesham44/public-repo.git', branch: 'dev'
+                git url: 'https://github.com/MariamWafik349/jenkins-pipeline-demo.git', branch: 'dev'
             }
         }
         stage('Build Docker Image') {
