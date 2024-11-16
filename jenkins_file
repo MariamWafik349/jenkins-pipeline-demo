@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = 'abdallah1312/test'  // Your Docker Hub repository
+        DOCKER_IMAGE = 'anwarfouad/mysql-app'  // Your Docker Hub repository
         DOCKER_TAG = 'latest'
         //K8S_DEPLOYMENT_FILE = 'k8s/deployment.yaml'  // Path to Kubernetes deployment YAML file
     }
