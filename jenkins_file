@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = 'mariamwafik333/fullstackspringbootangular_1'
+        DOCKER_IMAGE = 'mayurdeshmukh7/myapp'
         DOCKER_TAG = 'latest'
     }
     stages {
