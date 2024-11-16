@@ -3,13 +3,12 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'mariamwafik333/fullstackspringbootangular_1'  // Your Docker Hub repository
         DOCKER_TAG = 'latest'
-        //K8S_DEPLOYMENT_FILE = 'k8s/deployment.yaml'  // Path to Kubernetes deployment YAML file
     }
     stages {
         stage('Checkout') {
             steps {
                 // Use named parameters for the git step
-                git url: '', branch: 'dev'
+                git url: 'https://github.com/MariamWafik349/jenkins-pipeline-demo.git', branch: 'dev'
             }
         }
         stage('Build Docker Image') {
