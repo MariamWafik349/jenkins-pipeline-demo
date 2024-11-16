@@ -1,14 +1,19 @@
-# Use the official Python base image
-FROM python:3.9-slim
-
-# Set the working directory
+# Stage 1: Build Angular application
+FROM node:16 AS frontend
 WORKDIR /app
+COPY frontend/ /app/
+RUN npm install && npm run build
 
-# Copy the Python script into the container
-COPY hello.py .
+# Stage 2: Build Spring Boot application
+FROM maven:3.8.7-openjdk-17 AS backend
+WORKDIR /app
+COPY backend/ /app/
+RUN mvn clean package -DskipTests
 
-# Expose port 5000 for the Flask app
-EXPOSE 5000
-
-# Run the Python script
-CMD ["python", "hello.py"]
+# Stage 3: Combine both
+FROM openjdk:17
+WORKDIR /app
+COPY --from=backend /app/target/*.jar app.jar
+COPY --from=frontend /app/dist/ /frontend/
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
